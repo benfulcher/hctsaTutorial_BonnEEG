@@ -59,6 +59,21 @@ TS_Compute(false);
 Because computation is near-instant, it can be a good first step to work through an analysis using _catch22_ features.
 The same analysis can then be repeated with the full power of the comprehensive _hctsa_ feature library if required.
 
+### Pre-filtering (`TS_Subset`)
+
+Sometimes you might want to restrict your analysis to certain types of time series or features from the get-go.
+For example, you may want to exclude features that are mean-dependent or length-dependent if you're interested in classifying time series based on their dynamical properties (rather than trivial properties of their mean level, or the length of the recording period).
+
+For this sort of function, we can first get the IDs of features that match a certain criteria, like those tagged with the keyword `'locdep'` (location-dependent):
+```matlab
+[IDs_locDep,IDs_notLocDep] = TS_GetIDs('locdep','HCTSA.mat','ops','Keywords');
+```
+
+And then generate a new `HCTSA` file with only `IDs_notLocDep` features included:
+```matlab
+TS_Subset('HCTSA.mat',[],IDs_notLocDep,true,'HCTSA_locDepFiltered.mat')
+```
+
 ### Checkin it out (`TS_InspectQuality`)
 
 The first thing you do when you have a computed `HCTSA.mat` file on your hands is to check how the computation went.
@@ -122,6 +137,11 @@ TS_LabelGroups('norm',{'eyesOpen','eyesClosed','epileptogenic','hippocampus','se
 
 This stored group information can now be leveraged by other _hctsa_ plotting and analysis tools.
 
+You can clear a given labeling as, e.g.,:
+```matlab
+TS_LabelGroups('norm','clear');
+```
+
 ### Checking out the data (`TS_PlotTimeSeries`)
 
 Now that the data are labelled, functions like `TS_PlotTimeSeries` will use this information automatically, to, for example, plot a fixed number of examples from each class:
@@ -164,6 +184,14 @@ You can see how your dataset appears when projected into a two-dimensional embed
 | ![](img/TS_PlotLowDim_PCA.png) | ![](img/TS_PlotLowDim_tSNE.png) |
 
 It will also tell you how well each individual component classifies the class labels, and an overall classification rate in the full feature space.
+
+You can also check out a subset by relabeling the data:
+```matlab
+TS_LabelGroups('norm',{'eyesOpen','seizure'})
+TS_PlotLowDim('norm','pca')
+```
+![](img/TS_PlotLowDim_TwoClass.png)
+
 Speaking of feature-based time-series classification...
 
 ## Classifying time series
@@ -181,3 +209,132 @@ TellMeAboutClassification(cfnParams)
 ```
 
 ### Running a feature-based classification (`TS_Classify`)
+Let's see how well we do with out default linear svm classifier at our five-class classification problem:
+
+```matlab
+TS_Classify('norm')
+```
+
+We are told:
+```text
+Mean (across folds) accuracy (5-class) using 10-fold svm_linear classification with 7034 features:
+92.400%
+```
+
+And we get a confusion matrix:
+
+![](img/confusionMatrix.png)
+
+We see some eyes-open--eyes-closed confusion and some epileptogenic--hippocampus confusion.
+
+#### Significance
+
+In this case it's clear that 92% is far greater than chance-level accuracy (20%), but in general we might need to do some permutation testing to evaluate how surprising the observed classification accuracy is relative to a random labeling of the data.
+
+To demonstrate how `TS_Classify` can do this, let's zoom in on a harder problem by focusing in on the hardest to classify pair:
+
+```matlab
+TS_LabelGroups('norm',{'epileptogenic','hippocampus'})
+numNulls = 20; % (a small number for demonstration)
+TS_Classify('norm',struct(),numNulls)
+```
+
+![](img/TS_ClassifyNulls.png)
+
+Our (very rough 20-sample) null is centered at 50% as it should, and it has a spread that looks to drop off around 60%---the real labeling (>85%) is clearly highly inconsistent with the null of random labeling (and we get very small _p_-value estimates).
+
+### Checking feature-set dependence (`TS_CompareFeatureSets`)
+
+Do specific classes of features drive the results?
+It would be worrying if all of the good performance can be explained by length-dependent features...
+Let's check:
+
+```matlab
+% We can boost up the number of repeats to reduce variance of a given cross-validation split:
+cfnParams = GiveMeDefaultClassificationParams('norm');
+cfnParams.numRepeats = 5;
+TS_CompareFeatureSets('norm',cfnParams)
+```
+
+And we can see some interesting dependencies here:
+
+![](img/TS_CompareFeatureSets.png)
+
+It's encouraging that removing any one of location-, length-, spread-dependent features doesn't drop the accuracy.
+And we can see that if we'd have saved the many hours of computation time by just using the _catch22_ feature set, we would have gotten a decent accuracy (but ~10% lower than the full feature set).
+
+### Low-dimensional performance (`TS_ClassifyLowDim`)
+
+We can see how well we can classify the data in low-dimensional feature spaces:
+
+```matlab
+TS_ClassifyLowDim('norm')
+```
+
+We're getting a pretty good approximation to the full feature set's classification performance with just five PCs:
+
+![](img/TS_ClassifyLowDim.png)
+
+### Good individual features (`TS_TopFeatures`)
+
+```matlab
+TS_TopFeatures('norm','classification')
+```
+
+Being a five-class problem, we use a fast linear classifier to compute single-feature accuracy values.
+
+We get a list of the most discriminative individual features to the commandline and some visualizations.
+
+| Description | Figure |
+| ::: | ::: |
+| A distribution of accuracies across all features | ![](img/TS_TopFeatures_2.png) |
+| Class distributions of some of the top features | ![](img/TS_TopFeatures_3.png) |
+| Pairwise dependencies between the top features | ![](img/TS_TopFeatures_1.png) |
+
+The final plot can be useful to interpret the groups of different types of features.
+
+When you have two classes, you can use a more conventional statistic of inter-class difference, like say a _t_-test:
+
+```matlab
+TS_LabelGroups('norm',{'epileptogenic','hippocampus'})
+TS_TopFeatures('norm','ttest')
+```
+
+You can also compare to a null distribution using randomly labeled data:
+
+```matlab
+TS_TopFeatures('norm','ttest',[],'numNulls',10)
+```
+
+Despite being a fairly rough null, you can see here that many individual features exceed null expectation:
+
+![](img/TS_TopFeatures_Null.png)
+
+### Probing specific features (`TS_FeatureSummary`)
+
+A guide to interpreting individual features is in the _hctsa_ documentation: the keywords can be a good guide, and you may need to go inside the code to understand what's being done.
+
+Often large clusters of complex features are actually driven by a simpler underlying difference (e.g., nonlinear dimension estimates are sensitive to the data distribution, so strong performance by a complex feature may actually be explained by a much simpler underlying change).
+
+There are some additional plots that can help you understand how specific features perform on your dataset.
+For example, we can pick a feature that looked interesting (like `AC_3` above), and inspect it in more detail with respect to how it assigns values to time series.
+
+We might like to look at the un-normalized time series to be able to more easily interpret the actual outputs of `AC_3` (rather than the unit interval normalized values in `HCTSA_N.mat`):
+
+```matlab
+TS_FeatureSummary(95,'raw')
+```
+
+![](img/TS_FeatureSummary.png)
+
+We can see the actual distribution of the autocorrelation at lag 3 and interpret how it distinguishes the classes, we can also see snippets of time series ordered by `AC_3` value.
+
+### Extras
+
+Visualize local neighborhods to time series in feature space:
+
+```matlab
+TS_SimSearch()
+```
+
+![](img/TS_SimSearch.png)
