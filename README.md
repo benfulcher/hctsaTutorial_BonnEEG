@@ -52,7 +52,7 @@ For your own dataset, it's often a good idea to get a full method pieced togethe
 [_catch22_](https://github.com/chlubba/catch22) is a C-coded reduced set of 22 features, which (after installing) can be run very quickly from within Matlab run for a given dataset as, for example:
 
 ```matlab
-TS_Init('INP_Bonn_EEG.mat','INP_mops_catch22.txt','INP_ops_catch22,txt');
+TS_Init('INP_Bonn_EEG.mat','INP_mops_catch22.txt','INP_ops_catch22.txt',true,'HCTSA_catch22.mat');
 TS_Compute(false);
 ```
 
