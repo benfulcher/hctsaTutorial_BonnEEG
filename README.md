@@ -56,7 +56,7 @@ TS_Init('INP_Bonn_EEG.mat','INP_mops_catch22.txt','INP_ops_catch22.txt',true,'HC
 TS_Compute(false);
 ```
 
-Because computation is near-instant, it can be a good first step to work through an analysis using _catch22_ features.
+Because computation is so fast, it can be a good first step to work through an analysis using _catch22_ features.
 The same analysis can then be repeated with the full power of the comprehensive _hctsa_ feature library if required.
 
 ### Pre-filtering (`TS_Subset`)
