@@ -56,7 +56,7 @@ TS_Init('INP_Bonn_EEG.mat','INP_mops_catch22.txt','INP_ops_catch22.txt',true,'HC
 TS_Compute(false);
 ```
 
-Because computation is so fast, it can be a good first step to work through an analysis using _catch22_ features.
+Because computation is so fast, it can be a good first step to work through a sample analysis using _catch22_ features.
 The same analysis can then be repeated with the full power of the comprehensive _hctsa_ feature library if required.
 
 ### Pre-filtering (`TS_Subset`)
@@ -338,3 +338,7 @@ TS_SimSearch()
 ```
 
 ![](img/TS_SimSearch.png)
+
+### Taking it further
+_hctsa_ implements some generic algorithms for leveraging large time-series feature spaces for a given application, but for specific scientific questions you will probably want to design new analysis methods.
+You can do this in Matlab, to work with the HCTSA `.mat` files, or export your computed data to `.csv` using `OutputToCSV` and then anlyze the exported data in another analysis environment.
