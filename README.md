@@ -1,5 +1,7 @@
 This is a tutorial on _hctsa_ time-series classification using the [Bonn University EEG dataset](http://epileptologie-bonn.de/cms/front_content.php?idcat=193&lang=3).
 
+A recording of the tutorial is on [YouTube](https://youtu.be/YwPX3rWxP_Y) (the analysis of this dataset is around the 1:52:00 mark).
+
 It will walk you through a basic analysis of the data, and a classification of the different labeled states from time-series features of the EEG.
 
 The paper that introduced this dataset is:
