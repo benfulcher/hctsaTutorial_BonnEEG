@@ -324,7 +324,10 @@ For example, we can pick a feature that looked interesting (like `AC_3` above), 
 We might like to look at the un-normalized time series to be able to more easily interpret the actual outputs of `AC_3` (rather than the unit interval normalized values in `HCTSA_N.mat`):
 
 ```matlab
+% In interactive mode (click to explore!):
 TS_FeatureSummary(95,'raw')
+% Turning off interactive mode:
+TS_FeatureSummary(95,'raw',true,false)
 ```
 
 ![](img/TS_FeatureSummary.png)
