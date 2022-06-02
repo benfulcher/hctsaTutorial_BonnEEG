@@ -179,19 +179,21 @@ TS_PlotLowDim('norm','pca')
 TS_PlotLowDim('norm','tsne')
 ```
 
-You can see how your dataset appears when projected into a two-dimensional embedding space of the full feature space:
+You can see how your dataset appears when projected into a two-dimensional embedding of the full feature space:
 
 | PCA | _t_-SNE |
-| :::: | :::: |
+| ---- | ---- |
 | ![](img/TS_PlotLowDim_PCA.png) | ![](img/TS_PlotLowDim_tSNE.png) |
 
 It will also tell you how well each individual component classifies the class labels, and an overall classification rate in the full feature space.
 
 You can also check out a subset by relabeling the data:
+
 ```matlab
 TS_LabelGroups('norm',{'eyesOpen','seizure'})
 TS_PlotLowDim('norm','pca')
 ```
+
 ![](img/TS_PlotLowDim_TwoClass.png)
 
 Speaking of feature-based time-series classification...
@@ -205,12 +207,14 @@ We can set the default parameters for classification in `GiveMeDefaultClassifica
 This can be modified and passed into other functions, or you can modify this function to set more appropriate defaults.
 
 You can check the defaults (applied to the labeling in `HCTSA_N.mat`) as:
+
 ```matlab
 cfnParams = GiveMeDefaultClassificationParams('norm');
 TellMeAboutClassification(cfnParams)
 ```
 
 ### Running a feature-based classification (`TS_Classify`)
+
 Let's see how well we do with out default linear svm classifier at our five-class classification problem:
 
 ```matlab
@@ -218,6 +222,7 @@ TS_Classify('norm')
 ```
 
 We are told:
+
 ```text
 Mean (across folds) accuracy (5-class) using 10-fold svm_linear classification with 7034 features:
 92.400%
@@ -243,7 +248,8 @@ TS_Classify('norm',struct(),numNulls)
 
 ![](img/TS_ClassifyNulls.png)
 
-Our (very rough 20-sample) null is centered at 50% as it should, and it has a spread that looks to drop off around 60%---the real labeling (>85%) is clearly highly inconsistent with the null of random labeling (and we get very small _p_-value estimates).
+Our (very rough 20-sample) null is centered at ~50% (as it should), and has a spread that looks to drop off around 60%.
+By contrast, the real labeling (>85%) is clearly highly inconsistent with the null of random labeling (and we obtain a very small _p_-value estimate).
 
 ### Checking feature-set dependence (`TS_CompareFeatureSets`)
 
@@ -263,7 +269,7 @@ And we can see some interesting dependencies here:
 ![](img/TS_CompareFeatureSets.png)
 
 It's encouraging that removing any one of location-, length-, spread-dependent features doesn't drop the accuracy.
-And we can see that if we'd have saved the many hours of computation time by just using the _catch22_ feature set, we would have gotten a decent accuracy (but ~10% lower than the full feature set).
+And we can see that if we'd have saved the many hours of computation time by just using the _catch22_ feature set, we would have gotten a decent approximation to the accuracy of the full _hctsa_ feature set (~80% instead of ~90%).
 
 ### Low-dimensional performance (`TS_ClassifyLowDim`)
 
@@ -288,7 +294,7 @@ Being a five-class problem, we use a fast linear classifier to compute single-fe
 We get a list of the most discriminative individual features to the commandline and some visualizations.
 
 | Description | Figure |
-| ::: | ::: |
+| --- | --- |
 | A distribution of accuracies across all features | ![](img/TS_TopFeatures_2.png) |
 | Class distributions of some of the top features | ![](img/TS_TopFeatures_3.png) |
 | Pairwise dependencies between the top features | ![](img/TS_TopFeatures_1.png) |
@@ -345,5 +351,6 @@ TS_SimSearch()
 ![](img/TS_SimSearch.png)
 
 ### Taking it further
+
 _hctsa_ implements some generic algorithms for leveraging large time-series feature spaces for a given application, but for specific scientific questions you will probably want to design new analysis methods.
-You can do this in Matlab, to work with the HCTSA `.mat` files, or export your computed data to `.csv` using `OutputToCSV` and then anlyze the exported data in another analysis environment.
+You can do this in Matlab, to work with the _hctsa_ `.mat` files, or export your computed data to `.csv` using `OutputToCSV` and then anlyze the exported data in another analysis environment.
