@@ -26,17 +26,20 @@ The first step is setting up the time series; you can see the input file that I'
 
 I need to specify the data I want to calculate features for, and add any additional metadata (such as class labels).
 _hctsa_ needs three variables:
-* A 500 x 1 `labels` cell (each element gives a unique identifying name to each time series);
-* A 500 x 1 `timeSeriesData` cell (each element contains the time-series data);
-* A 500 x 1 `keywords` cell (each element contains a comma-delimited set of keywords--in this case I've just given each time series a single keyword corresponding to one of the five classes we want to classify).
+
+- A 500 x 1 `labels` cell (each element gives a unique identifying name to each time series);
+- A 500 x 1 `timeSeriesData` cell (each element contains the time-series data);
+- A 500 x 1 `keywords` cell (each element contains a comma-delimited set of keywords--in this case I've just given each time series a single keyword corresponding to one of the five classes we want to classify).
 
 So all of this is saved in our time-series input file, `INP_Bonn_EEG.mat`, and defines everything we need to know about the time series.
 There are two files in _hctsa_ (`INP_ops.txt` and `INP_mops.txt`) that do a similar job for the time-series features (as `Operations`, what we call the individual features, and `MasterOperations`, the specific pieces of code and their inputs that output sets of features).
 
 This default feature library is used by default when we initialize our dataset:
+
 ```matlab
 TS_Init('INP_Bonn_EEG.mat')
 ```
+
 Running this will initialize the _hctsa_ analysis with a `HCTSA.mat` file containing, including tables defining the time series (`TimeSeries`) and the features (`Operations`), as well as matrices that contain the results of applying every operation to every time series (`TS_DataMat`).
 Have a peek inside at these tables and matrices to get a better sense of how these _hctsa_ files are structured :eyes:.
 
@@ -67,11 +70,13 @@ Sometimes you might want to restrict your analysis to certain types of time seri
 For example, you may want to exclude features that are mean-dependent or length-dependent if you're interested in classifying time series based on their dynamical properties (rather than trivial properties of their mean level, or the length of the recording period).
 
 For this sort of function, we can first get the IDs of features that match a certain criteria, like those tagged with the keyword `'locdep'` (location-dependent):
+
 ```matlab
 [IDs_locDep,IDs_notLocDep] = TS_GetIDs('locdep','HCTSA.mat','ops','Keywords');
 ```
 
 And then generate a new `HCTSA` file with only `IDs_notLocDep` features included:
+
 ```matlab
 TS_Subset('HCTSA.mat',[],IDs_notLocDep,true,'HCTSA_locDepFiltered.mat')
 ```
@@ -107,9 +112,12 @@ We may next want to take the diverse set of >7000 features and:
 The application in mind will guide which settings to use: for example when performing classification we may not tolerate any missing values in our data at all, and some classifiers will be more or less sensitive to vast differences in scale between features (e.g., one features might be a _p_-value that varies from 0–1, while another might vary up to 10^8).
 
 We can do both of these steps by running:
+
 ```matlab
-TS_Normalize()
+TS_Normalize(); % for all defaults, or specify:
+TS_Normalize('mixedSigmoid',[0.7,1],'HCTSA.mat',true)
 ```
+
 which by default filters on `[0.70,1]` (require 70%-good time series, and 100%-good features) and normalizes 'good' features using a `'mixedSigmoid'`.
 
 This saves the new data to a new file: `HCTSA_N.mat`.
@@ -128,11 +136,13 @@ TS_LabelGroups('norm')
 In this case it can automatically assign the five groups (cf. `TS_WhatKeywords()`), because each time series only has a single keyword attached to it.
 
 We could also focus on a two-class problem, for example, as:
+
 ```matlab
 TS_LabelGroups('norm',{'eyesOpen','seizure'})
 ```
 
 And we could be explicit in setting up the five-class problem, as:
+
 ```matlab
 TS_LabelGroups('norm',{'eyesOpen','eyesClosed','epileptogenic','hippocampus','seizure'})
 ```
@@ -147,6 +157,7 @@ TS_LabelGroups('norm','clear');
 ### Checking out the data (`TS_PlotTimeSeries`)
 
 Now that the data are labelled, functions like `TS_PlotTimeSeries` will use this information automatically, to, for example, plot a fixed number of examples from each class:
+
 ```matlab
 TS_PlotTimeSeries('norm')
 ```
@@ -186,6 +197,13 @@ You can see how your dataset appears when projected into a two-dimensional embed
 | ![](img/TS_PlotLowDim_PCA.png) | ![](img/TS_PlotLowDim_tSNE.png) |
 
 It will also tell you how well each individual component classifies the class labels, and an overall classification rate in the full feature space.
+
+The best way is the interactive way:
+
+```matlab
+TS_PlotLowDimInspect('norm','pca')
+TS_PlotLowDimInspect('norm','tsne')
+```
 
 You can also check out a subset by relabeling the data:
 
