@@ -37,7 +37,7 @@ There are two files in _hctsa_ (`INP_ops.txt` and `INP_mops.txt`) that do a simi
 This default feature library is used by default when we initialize our dataset:
 
 ```matlab
-TS_Init('INP_Bonn_EEG.mat')
+TS_Init('INP_Bonn_EEG.mat','hctsa')
 ```
 
 Running this will initialize the _hctsa_ analysis with a `HCTSA.mat` file containing, including tables defining the time series (`TimeSeries`) and the features (`Operations`), as well as matrices that contain the results of applying every operation to every time series (`TS_DataMat`).
@@ -53,11 +53,12 @@ The result is a fully computed `HCTSA.mat` file (initialized and computed using 
 If you download this file as `HCTSA.mat` to this tutorial directory, you will have skipped the hefty computations and can get on with the fun stuff.
 
 #### Aside, _catch22_
+
 For your own dataset, it's often a good idea to get a full method pieced together to test the usefulness of a feature-based analysis, but the computation time can be a barrier.
-[_catch22_](https://github.com/chlubba/catch22) is a C-coded reduced set of 22 features, which (after installing) can be run very quickly from within Matlab run for a given dataset as, for example:
+[_catch22_](https://github.com/DynamicsAndNeuralSystems/catch22) is a C-coded reduced set of 22 features, which (after installing) can be run very quickly from within Matlab run for a given dataset as, for example:
 
 ```matlab
-TS_Init('INP_Bonn_EEG.mat','INP_mops_catch22.txt','INP_ops_catch22.txt',true,'HCTSA_catch22.mat');
+TS_Init('INP_Bonn_EEG.mat','catch22',false,'HCTSA_catch22.mat');
 TS_Compute(false);
 ```
 
@@ -81,7 +82,7 @@ And then generate a new `HCTSA` file with only `IDs_notLocDep` features included
 TS_Subset('HCTSA.mat',[],IDs_notLocDep,true,'HCTSA_locDepFiltered.mat')
 ```
 
-### Checkin it out (`TS_InspectQuality`)
+### Checkin' it out (`TS_InspectQuality`)
 
 The first thing you do when you have a computed `HCTSA.mat` file on your hands is to check how the computation went.
 
@@ -201,8 +202,8 @@ It will also tell you how well each individual component classifies the class la
 The best way is the interactive way:
 
 ```matlab
-TS_PlotLowDimInspect('norm','pca')
-TS_PlotLowDimInspect('norm','tsne')
+TS_LowDimInspect('norm','pca')
+TS_LowDimInspect('norm','tsne')
 ```
 
 You can also check out a subset by relabeling the data:
