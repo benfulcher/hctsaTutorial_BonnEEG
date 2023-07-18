@@ -22,7 +22,7 @@ You're going to need [hctsa](https://github.com/benfulcher/hctsa) installed.
 ### Initializing an _hctsa_ computation (`TS_Init`)
 
 Let's first check out how we would set this dataset up for an _hctsa_ analysis.
-The first step is setting up the time series; you can see the input file that I've set up for this dataset ([cloudstor](https://cloudstor.aarnet.edu.au/plus/s/6sRD6IPMJyZLNlN)).
+The first step is setting up the time series; you can see the input file that I've set up for this dataset ([zenodo](https://zenodo.org/record/8098150)).
 
 I need to specify the data I want to calculate features for, and add any additional metadata (such as class labels).
 _hctsa_ needs three variables:
@@ -49,7 +49,7 @@ So all we need now is to run all of these computations specified in our initiali
 This is a big calculation, but you can test it by running, say, `TS_Compute(false,1,1:50)`, which will load the data from `HCTSA.mat`, compute the first time series and the first 50 operations, and save the results back to `HCTSA.mat` (the `false` flag says not to use parallel processing across cores; you can switch this `true` if you want to try that).
 
 Because of the size of the dataset, we distributed different sets of time series across different nodes of a computing cluster using some simple shell scripts contained in [this repository](https://github.com/benfulcher/distributed_hctsa).
-The result is a fully computed `HCTSA.mat` file (initialized and computed using _hctsa_ v1.03), which you can cheat and download from [cloudstor](https://cloudstor.aarnet.edu.au/plus/s/PWUIAdIeHhtkxsF).
+The result is a fully computed `HCTSA.mat` file (initialized and computed using _hctsa_ v1.03), which you can cheat and download from [zenodo](https://zenodo.org/record/8098150).
 If you download this file as `HCTSA.mat` to this tutorial directory, you will have skipped the hefty computations and can get on with the fun stuff.
 
 #### Aside, _catch22_
